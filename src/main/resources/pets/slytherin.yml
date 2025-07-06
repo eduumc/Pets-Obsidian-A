@@ -1,0 +1,18 @@
+id: "slytherin"
+shop: true
+display-name: "&2Mascota de Slytherin"
+show-display-name: true
+lore:
+  - "&aAstucia, ambición y determinación."
+head-type: "base64"
+head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Q1NDE1NDFkYmI4N2ViMWMzYzI4M2QxYjY0Zjc2OTA2NWMzMGIwY2FmODc0NjI0M2FlM2E3ZDUxY2U2YTEifX19"
+price: 1000.0
+permission: "pet.use.slytherin"
+effects: []
+on-hit-effects:
+  - "POISON:0:5" # Efecto:Amplificador:Duración(segundos)
+on-hit-cooldown: 200 # En ticks (20 ticks = 1 segundo) -> 10 segundos
+particles:
+  enabled: true
+  type: "SNEEZE"
+  amount: 1

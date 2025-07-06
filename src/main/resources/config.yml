@@ -1,0 +1,39 @@
+prefix: "&d&lPets &8» &r"
+shop:
+  enabled: true
+pet-settings:
+  default-speed: 0.35
+  follow-distance: 1.5
+  follow-height-offset: 0.5
+messages:
+  no-permission: "&cNo tienes permiso para ejecutar este comando."
+  player-only-command: "&cEste comando solo puede ser ejecutado por un jugador."
+  player-not-found: "&cJugador no encontrado o no está en línea."
+  pet-summoned: "&aHas invocado a tu mascota {pet_name}&a."
+  pet-removed: "&eTu mascota ha sido guardada."
+  no-pet-active: "&cNo tienes ninguna mascota activa."
+  pet-already-active: "&cYa tienes una mascota activa. ¡La anterior ha sido guardada!"
+  not-enough-money: "&cNo tienes suficiente dinero. Necesitas &e${price}&c."
+  region-denied: "&cNo puedes usar tu mascota en esta zona."
+  config-reloaded: "&aLa configuración de Pets-Obsidian ha sido recargada."
+  give-usage: "&cModo de uso: /pet give <usuario> <id_mascota>"
+  give-no-pet-found: "&cNo se encontró una mascota con ese ID."
+  give-success: "&aHas dado la mascota {pet_name} &aa &e{player_name}&a."
+  give-received: "&aHas recibido la mascota {pet_name}&a."
+  delete-usage: "&cModo de uso: /pet delete <usuario> <id_mascota>"
+  delete-not-owned: "&cEse jugador no posee la mascota '{pet_id}'."
+  delete-success: "&aHas quitado la mascota '{pet_id}' a {player_name}."
+  spawn-usage: "&cModo de uso: /pet spawn <id_mascota>"
+  spawn-not-owned: "&cNo posees una mascota con ese ID."
+  spawn-no-config: "&cError: No se encontró la configuración para esa mascota."
+  pet-info-header: "&6&m----------------------------------------"
+  pet-info-body:
+    - "&eInformación de la mascota &d{pet_name}"
+    - " "
+    - " &7ID: &f{pet_id}"
+    - " &7Permiso: &f{pet_permission}"
+    - " &7Precio: &a${pet_price}"
+    - " &7Efectos Pasivos: &b{pet_effects}"
+    - " &7Efectos de Combate: &c{pet_on_hit_effects}"
+    - " &7Partículas: &b{pet_particles}"
+  pet-info-footer: "&6&m----------------------------------------"

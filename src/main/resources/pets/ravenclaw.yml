@@ -1,0 +1,16 @@
+id: "ravenclaw"
+shop: true
+display-name: "&9Mascota de Ravenclaw"
+show-display-name: true
+lore:
+  - "&1Inteligencia, sabiduría y creatividad."
+head-type: "base64"
+head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2QxY2Y2YjE5YjQzMWI3YjQxNzQzYjY0YjQwMjM4YjcxY2FhY2QxNjg5Y2I0NzE2MTI5M2E4MmQxZTE3YjU5In19fQ=="
+price: 1000.0
+permission: "pet.use.ravenclaw"
+effects:
+  - "DAMAGE_RESISTANCE:0"
+particles:
+  enabled: true
+  type: "ENCHANTMENT_TABLE"
+  amount: 5

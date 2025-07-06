@@ -1,0 +1,25 @@
+name: PetsObsidian
+version: '1.0.4'
+main: us.edumc.obsidianstudios.pets.PetsObsidian
+api-version: '1.19'
+authors: [EduMC_]
+description: Un plugin avanzado de mascotas visuales para servidores de Spigot.
+softdepend: [Vault, PlaceholderAPI, WorldGuard]
+commands:
+  pet:
+    description: Comando principal para gestionar las mascotas.
+    aliases: [pets, mascota]
+    usage: "/<command> help"
+permissions:
+  pet.admin.reload:
+    description: Permite usar el comando /pet reload.
+    default: op
+  pet.admin.give:
+    description: Permite dar invocadores de mascotas a otros jugadores.
+    default: op
+  pet.admin.delete:
+    description: Permite quitarle una mascota a un jugador.
+    default: op
+  pet.use.*:
+    description: Permite usar todas las mascotas.
+    default: op

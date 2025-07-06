@@ -1,0 +1,8 @@
+d: "hufflepuff"
+shop: true
+display-name: "&eMascota de Hufflepuff"
+show-display-name: true
+lore:
+  - "&6Lealtad, paciencia y trabajo duro."
+head-type: "base64"
+head-texture: ""
