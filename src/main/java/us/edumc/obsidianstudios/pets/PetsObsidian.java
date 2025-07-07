@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class PetsObsidian extends JavaPlugin {
 
@@ -63,7 +62,6 @@ public final class PetsObsidian extends JavaPlugin {
 
         setupIntegrations();
 
-        // Aplicamos el filtro de la consola de forma permanente al iniciar el plugin.
         PetCommand petCommand = new PetCommand(this);
         getCommand("pet").setExecutor(petCommand);
         getCommand("pet").setTabCompleter(petCommand);

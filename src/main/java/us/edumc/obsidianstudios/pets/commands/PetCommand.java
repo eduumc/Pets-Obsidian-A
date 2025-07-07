@@ -1,7 +1,7 @@
 package us.edumc.obsidianstudios.pets.commands;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -153,10 +153,10 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         }
 
         playerDataManager.addPet(target, petId);
-        sender.sendMessage(ChatUtil.translate(configManager.getPrefixedMessage("give-success")
+        sender.sendMessage(ChatUtil.parse(configManager.getPrefixedMessage("give-success")
                 .replace("{pet_name}", petConfig.getDisplayName())
                 .replace("{player_name}", target.getName())));
-        target.sendMessage(ChatUtil.translate(configManager.getPrefixedMessage("give-received")
+        target.sendMessage(ChatUtil.parse(configManager.getPrefixedMessage("give-received")
                 .replace("{pet_name}", petConfig.getDisplayName())));
     }
 
@@ -230,7 +230,7 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         String header = configManager.getConfig().getString("messages.pet-info-header");
         String footer = configManager.getConfig().getString("messages.pet-info-footer");
 
-        sender.sendMessage(ChatUtil.translate(header));
+        sender.sendMessage(ChatUtil.parse(header));
 
         String effects = petConfig.getEffects().isEmpty() ? "Ninguno" : String.join(", ", petConfig.getEffects());
         String onHitEffects = petConfig.getOnHitEffects().isEmpty() ? "Ninguno" : String.join(", ", petConfig.getOnHitEffects());
@@ -244,10 +244,10 @@ public class PetCommand implements CommandExecutor, TabCompleter {
                     .replace("{pet_effects}", effects)
                     .replace("{pet_on_hit_effects}", onHitEffects)
                     .replace("{pet_particles}", particles);
-            sender.sendMessage(ChatUtil.translate(replacedLine));
+            sender.sendMessage(ChatUtil.parse(replacedLine));
         }
 
-        sender.sendMessage(ChatUtil.translate(footer));
+        sender.sendMessage(ChatUtil.parse(footer));
     }
 
     private void handleReload(CommandSender sender) {

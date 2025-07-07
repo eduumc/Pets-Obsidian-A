@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>us.edumc.obsidianstudios</groupId>
-    <artifactId>Obsidian-Pets</artifactId>
-    <version>1.0.5</version>
+    <artifactId>pets</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Pets-Obsidian</name>
+    <name>PetsObsidian</name>
 
     <properties>
         <java.version>17</java.version>
@@ -84,13 +84,6 @@
             <version>1.19.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- CORRECCIÓN: Dependencia de Authlib añadida explícitamente -->
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>3.18.38</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>Vault</artifactId>
@@ -115,6 +108,7 @@
             <version>7.0.8</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Dependencia para MiniMessage y soporte de colores RGB -->
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>

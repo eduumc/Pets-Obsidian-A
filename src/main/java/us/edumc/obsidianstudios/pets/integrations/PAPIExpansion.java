@@ -1,7 +1,6 @@
 package us.edumc.obsidianstudios.pets.integrations;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
@@ -19,7 +18,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
     @Override
     public @NotNull String getIdentifier() { return "pet"; }
     @Override
-    public @NotNull String getAuthor() { return "eduumc"; }
+    public @NotNull String getAuthor() { return "edumc_"; }
     @Override
     public @NotNull String getVersion() { return "1.0.0"; }
     @Override
@@ -33,7 +32,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
             case "active":
                 return activePet != null ? "Sí" : "No";
             case "name":
-                return activePet != null ? LegacyComponentSerializer.legacySection().serialize(ChatUtil.parse(activePet.getConfig().getDisplayName())) : "Ninguna";
+                return activePet != null ? ChatUtil.translate(activePet.getConfig().getDisplayName()) : "Ninguna";
             case "id":
                 return activePet != null ? activePet.getConfig().getId() : "ninguno";
         }

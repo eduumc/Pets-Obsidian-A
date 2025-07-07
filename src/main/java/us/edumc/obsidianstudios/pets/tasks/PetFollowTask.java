@@ -45,11 +45,8 @@ public class PetFollowTask extends BukkitRunnable {
                 player.sendMessage(plugin.getConfigManager().getPrefixedMessage("region-denied"));
                 wasInDeniedRegion = true;
             }
-            // Compatibilidad: Paper (Adventure) y Spigot legacy
-            try {
-                pet.getClass().getMethod("customName", Component.class).invoke(pet, Component.text(""));
-            } catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
-                pet.setCustomName(""); // Bukkit/Spigot legacy
+            if (pet.isCustomNameVisible()) {
+                pet.setCustomNameVisible(false);
             }
             return;
         } else {
@@ -74,12 +71,7 @@ public class PetFollowTask extends BukkitRunnable {
         if (petConfig.isShowDisplayName()) {
             PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, petConfig.getId());
             String name = petData.getCustomName() != null ? petData.getCustomName() : petConfig.getDisplayName();
-            // Compatibilidad: Paper (Adventure) y Spigot legacy
-            try {
-                pet.getClass().getMethod("customName", Component.class).invoke(pet, ChatUtil.parse(name));
-            } catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
-                pet.setCustomName(ChatUtil.translate(name)); // Bukkit/Spigot legacy
-            }
+            pet.customName(ChatUtil.parse(name));
             pet.setCustomNameVisible(true);
         }
     }
