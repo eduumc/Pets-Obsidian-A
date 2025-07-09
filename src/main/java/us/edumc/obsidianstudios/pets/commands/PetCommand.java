@@ -1,6 +1,5 @@
 package us.edumc.obsidianstudios.pets.commands;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -152,11 +151,19 @@ public class PetCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        playerDataManager.addPet(target, petId);
-        sender.sendMessage(ChatUtil.parse(configManager.getPrefixedMessage("give-success")
+        ItemStack petSpawner = petConfig.createHead();
+        ItemMeta meta = petSpawner.getItemMeta();
+        meta.setDisplayName(ChatUtil.translate("&aInvocador de Mascota: " + petConfig.getDisplayName()));
+        meta.setLore(Collections.singletonList(ChatUtil.translate("&7¡Haz clic derecho para reclamar esta mascota!")));
+        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pet-spawner-id"), PersistentDataType.STRING, petId);
+        petSpawner.setItemMeta(meta);
+
+        target.getInventory().addItem(petSpawner);
+
+        sender.sendMessage(ChatUtil.translate(configManager.getPrefixedMessage("give-success")
                 .replace("{pet_name}", petConfig.getDisplayName())
                 .replace("{player_name}", target.getName())));
-        target.sendMessage(ChatUtil.parse(configManager.getPrefixedMessage("give-received")
+        target.sendMessage(ChatUtil.translate(configManager.getPrefixedMessage("give-received")
                 .replace("{pet_name}", petConfig.getDisplayName())));
     }
 
@@ -230,7 +237,7 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         String header = configManager.getConfig().getString("messages.pet-info-header");
         String footer = configManager.getConfig().getString("messages.pet-info-footer");
 
-        sender.sendMessage(ChatUtil.parse(header));
+        sender.sendMessage(ChatUtil.translate(header));
 
         String effects = petConfig.getEffects().isEmpty() ? "Ninguno" : String.join(", ", petConfig.getEffects());
         String onHitEffects = petConfig.getOnHitEffects().isEmpty() ? "Ninguno" : String.join(", ", petConfig.getOnHitEffects());
@@ -244,10 +251,10 @@ public class PetCommand implements CommandExecutor, TabCompleter {
                     .replace("{pet_effects}", effects)
                     .replace("{pet_on_hit_effects}", onHitEffects)
                     .replace("{pet_particles}", particles);
-            sender.sendMessage(ChatUtil.parse(replacedLine));
+            sender.sendMessage(ChatUtil.translate(replacedLine));
         }
 
-        sender.sendMessage(ChatUtil.parse(footer));
+        sender.sendMessage(ChatUtil.translate(footer));
     }
 
     private void handleReload(CommandSender sender) {

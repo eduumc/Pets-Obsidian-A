@@ -12,10 +12,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
-import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,16 +63,21 @@ public class PetConfig {
         if (meta == null) return head;
 
         if (headType.equalsIgnoreCase("base64") && headTexture != null) {
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-            profile.getProperties().put("textures", new Property("textures", headTexture));
+            // ================== CORRECCIÓN AQUÍ ==================
+            // Se usa la API moderna de Paper/Spigot para evitar la advertencia de la consola.
+            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), this.id);
+            PlayerTextures textures = profile.getTextures();
+            URL url;
             try {
-                Field profileField = meta.getClass().getDeclaredField("profile");
-                profileField.setAccessible(true);
-                profileField.set(meta, profile);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                PetsObsidian.getInstance().getLogger().warning("No se pudo aplicar la textura a la cabeza para '" + id + "'.");
-                e.printStackTrace();
+                String decoded = new String(Base64.getDecoder().decode(headTexture));
+                url = new URL(decoded.substring("{\"textures\":{\"SKIN\":{\"url\":\"".length(), decoded.length() - "\"}}}".length()));
+            } catch (Exception e) {
+                PetsObsidian.getInstance().getLogger().warning("Error al decodificar la textura de la mascota '" + id + "'.");
+                return head;
             }
+            textures.setSkin(url);
+            meta.setOwnerProfile(profile);
+
         } else if (headType.equalsIgnoreCase("player") && headTexture != null) {
             meta.setOwningPlayer(Bukkit.getOfflinePlayer(headTexture));
         }

@@ -1,6 +1,5 @@
 package us.edumc.obsidianstudios.pets.gui;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 
 public class ShopGUI {
 
+    public static final String GUI_TITLE = ChatUtil.translate("§eTienda de Mascotas");
     private final PetsObsidian plugin;
     private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
@@ -38,29 +38,29 @@ public class ShopGUI {
         int guiSize = Math.max(18, (int) (Math.ceil(petCount / 9.0) * 9) + 9);
         if (guiSize > 54) guiSize = 54;
 
-        Inventory gui = Bukkit.createInventory(null, guiSize, "§eTienda de Mascotas");
+        Inventory gui = Bukkit.createInventory(null, guiSize, GUI_TITLE);
 
         for (PetConfig petConfig : shopPets) {
             ItemStack item = petConfig.getGuiItem(player, true);
             ItemMeta meta = item.getItemMeta();
-            List<Component> lore = meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+            List<String> lore = meta.getLore() != null ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
 
-            lore.add(Component.empty());
+            lore.add("");
 
             if (playerDataManager.getOwnedPets(player).contains(petConfig.getId())) {
-                lore.add(ChatUtil.parse("<gold>✔ Ya la posees</gold>"));
+                lore.add(ChatUtil.translate("&6✔ Ya la posees"));
             } else if (petConfig.hasPermission(player)) {
-                lore.add(ChatUtil.parse("<green>▶ Clic para comprar por <aqua>$" + petConfig.getPrice() + "</aqua></green>"));
+                lore.add(ChatUtil.translate("&a▶ Clic para comprar por &b$" + petConfig.getPrice()));
             }
 
-            meta.lore(lore);
+            meta.setLore(lore);
             item.setItemMeta(meta);
             gui.addItem(item);
         }
 
         ItemStack backButton = new ItemStack(Material.BARRIER);
         ItemMeta backMeta = backButton.getItemMeta();
-        backMeta.displayName(ChatUtil.parse("<red>« Volver</red>"));
+        backMeta.setDisplayName(ChatUtil.translate("&c« Volver"));
         backButton.setItemMeta(backMeta);
         gui.setItem(guiSize - 5, backButton);
 

@@ -1,8 +1,9 @@
-name: PetsObsidian
-version: '1.0.4'
+name: Pets-Obsidian
+version: '1.1.0'
 main: us.edumc.obsidianstudios.pets.PetsObsidian
 api-version: '1.19'
 authors: [EduMC_]
+website: https://discord.gg/vM6xaYZbDe
 description: Un plugin avanzado de mascotas visuales para servidores de Spigot.
 softdepend: [Vault, PlaceholderAPI, WorldGuard]
 commands:

@@ -39,6 +39,11 @@ public class PlayerChatListener implements Listener {
             petData.setCustomName(message);
             plugin.getPlayerDataManager().savePetData(player, petData);
 
+            // Actualizar la mascota activa si es la que se está editando
+            if (plugin.getPetManager().hasPet(player) && plugin.getPetManager().getActivePet(player).getConfig().getId().equals(petId)) {
+                plugin.getPetManager().getActivePet(player).updateName(message);
+            }
+
             player.sendMessage(ChatUtil.translate("&a¡Nombre de la mascota actualizado a '" + message + "&a'!"));
             Bukkit.getScheduler().runTask(plugin, () -> new PetManagementGUI(plugin).open(player, petId));
         }

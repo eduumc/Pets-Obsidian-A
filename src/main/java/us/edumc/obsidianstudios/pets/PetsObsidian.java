@@ -16,13 +16,16 @@ import us.edumc.obsidianstudios.pets.listeners.PetManagementListener;
 import us.edumc.obsidianstudios.pets.listeners.PlayerChatListener;
 import us.edumc.obsidianstudios.pets.listeners.PlayerListener;
 import us.edumc.obsidianstudios.pets.managers.ConfigManager;
+import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.managers.PlayerDataManager;
+import us.edumc.obsidianstudios.pets.util.ConsoleFilter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class PetsObsidian extends JavaPlugin {
 
@@ -30,9 +33,10 @@ public final class PetsObsidian extends JavaPlugin {
     private ConfigManager configManager;
     private PetManager petManager;
     private PlayerDataManager playerDataManager;
+    private PetLevelManager petLevelManager; // Nuevo manager
     private VaultIntegration vaultIntegration;
     private WorldGuardIntegration worldGuardIntegration;
-    public static StateFlag PETS_DENY_FLAG;
+    public static StateFlag PERMITTED_PETS_FLAG;
 
     private final Map<UUID, String> playerNamingMap = new HashMap<>();
     private final Map<UUID, String> playerParticleMap = new HashMap<>();
@@ -42,11 +46,11 @@ public final class PetsObsidian extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
             FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
             try {
-                StateFlag flag = new StateFlag("pets-deny", false);
+                StateFlag flag = new StateFlag("permitted-pets", true);
                 registry.register(flag);
-                PETS_DENY_FLAG = flag;
+                PERMITTED_PETS_FLAG = flag;
             } catch (FlagConflictException e) {
-                getLogger().log(Level.WARNING, "No se pudo registrar la flag 'pets-deny' de WorldGuard (probablemente ya existe).");
+                getLogger().log(Level.WARNING, "No se pudo registrar la flag 'permitted-pets' de WorldGuard (probablemente ya existe).");
             }
         }
     }
@@ -57,10 +61,13 @@ public final class PetsObsidian extends JavaPlugin {
 
         this.configManager = new ConfigManager(this);
         configManager.loadConfigs();
-        this.petManager = new PetManager(this);
         this.playerDataManager = new PlayerDataManager(this);
+        this.petLevelManager = new PetLevelManager(this); // Inicializar el nuevo manager
+        this.petManager = new PetManager(this);
 
         setupIntegrations();
+
+        Logger.getLogger("").setFilter(new ConsoleFilter());
 
         PetCommand petCommand = new PetCommand(this);
         getCommand("pet").setExecutor(petCommand);
@@ -111,6 +118,7 @@ public final class PetsObsidian extends JavaPlugin {
     public ConfigManager getConfigManager() { return configManager; }
     public PetManager getPetManager() { return petManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
+    public PetLevelManager getPetLevelManager() { return petLevelManager; } // Getter para el nuevo manager
     public VaultIntegration getVaultIntegration() { return vaultIntegration; }
     public WorldGuardIntegration getWorldGuardIntegration() { return worldGuardIntegration; }
     public Map<UUID, String> getPlayerNamingMap() { return playerNamingMap; }

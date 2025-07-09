@@ -1,11 +1,11 @@
 id: "slytherin"
 shop: true
-display-name: "&2Mascota de Slytherin"
+display-name: "&2Slytherin"
 show-display-name: true
 lore:
   - "&aAstucia, ambición y determinación."
 head-type: "base64"
-head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Q1NDE1NDFkYmI4N2ViMWMzYzI4M2QxYjY0Zjc2OTA2NWMzMGIwY2FmODc0NjI0M2FlM2E3ZDUxY2U2YTEifX19"
+head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGVjMjUwZTZmZWU1NjEzZTU5ZDRjMzhhMjRjMTI4YWJkZDY5OGQzMTU0YmZjNWUwMjE3NDQzM2U4ZDJmZDllZSJ9fX0="
 price: 1000.0
 permission: "pet.use.slytherin"
 effects: []

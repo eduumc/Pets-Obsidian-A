@@ -1,0 +1,36 @@
+# ======================================================= #
+#             Configuración de Niveles de Mascotas        #
+# ======================================================= #
+
+# Fórmula para calcular la XP necesaria para el siguiente nivel.
+# Puedes usar "level" como variable para el nivel actual.
+# Ejemplos:
+# "100 * level" (lineal)
+# "100 * Math.pow(level, 1.5)" (curva de experiencia)
+level-xp-formula: "100 * level"
+
+# Fuentes de obtención de XP para las mascotas.
+xp-sources:
+  # XP ganada cada minuto que la mascota está activa.
+  passive-xp-per-minute: 10.0
+  # XP ganada al matar un monstruo hostil.
+  mob-kill: 5.0
+  # XP ganada al matar a otro jugador.
+  player-kill: 25.0
+
+# Sistema para prevenir el farmeo de XP matando al mismo jugador.
+anti-abuse:
+  # Tiempo en segundos que un jugador debe esperar antes de volver a ganar XP por matar al mismo jugador.
+  player-kill-cooldown-seconds: 300 # 5 minutos
+
+# Recompensas que se otorgan al alcanzar un nivel específico.
+rewards:
+  '10': # Al llegar al nivel 10
+    effects:
+      - "SPEED:1" # Otorga Velocidad II de forma permanente mientras la mascota esté activa.
+  '25':
+    effects:
+      - "JUMP:1" # Otorga Salto II
+  '50':
+    effects:
+      - "FAST_DIGGING:0" # Otorga Prisa I

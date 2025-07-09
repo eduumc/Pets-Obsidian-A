@@ -3,6 +3,7 @@ package us.edumc.obsidianstudios.pets.models;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import us.edumc.obsidianstudios.pets.tasks.PetFollowTask;
+import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
 public class Pet {
 
@@ -16,6 +17,18 @@ public class Pet {
         this.config = config;
         this.armorStand = armorStand;
         this.followTask = followTask;
+    }
+
+    public void updateName(String newName) {
+        if (armorStand != null && !armorStand.isDead()) {
+            armorStand.setCustomName(ChatUtil.translate(newName));
+        }
+    }
+
+    public void updateNameVisibility(boolean visible) {
+        if (armorStand != null && !armorStand.isDead()) {
+            armorStand.setCustomNameVisible(visible);
+        }
     }
 
     public Player getOwner() { return owner; }

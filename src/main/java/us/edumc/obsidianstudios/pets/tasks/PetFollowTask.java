@@ -1,6 +1,5 @@
 package us.edumc.obsidianstudios.pets.tasks;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
@@ -40,18 +39,20 @@ public class PetFollowTask extends BukkitRunnable {
         }
 
         WorldGuardIntegration wg = plugin.getWorldGuardIntegration();
-        if (wg != null && wg.isDenied(player)) {
+        if (wg != null && !wg.isAllowed(player)) {
             if (!wasInDeniedRegion) {
                 player.sendMessage(plugin.getConfigManager().getPrefixedMessage("region-denied"));
                 wasInDeniedRegion = true;
             }
-            if (pet.isCustomNameVisible()) {
-                pet.setCustomNameVisible(false);
+            if (pet.isVisible()) {
+                pet.setVisible(false);
             }
             return;
         } else {
             if (wasInDeniedRegion) {
-                updatePetName();
+                if (!pet.isVisible()) {
+                    pet.setVisible(true);
+                }
             }
             wasInDeniedRegion = false;
         }
@@ -67,19 +68,20 @@ public class PetFollowTask extends BukkitRunnable {
         }
     }
 
-    private void updatePetName() {
+    public void updatePetName() {
         if (petConfig.isShowDisplayName()) {
             PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, petConfig.getId());
             String name = petData.getCustomName() != null ? petData.getCustomName() : petConfig.getDisplayName();
-            pet.customName(ChatUtil.parse(name));
-            pet.setCustomNameVisible(true);
+            pet.setCustomName(ChatUtil.translate(name));
+            pet.setCustomNameVisible(petData.isDisplayNameVisible());
         }
     }
 
     private Location getTargetLocation() {
         PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, petConfig.getId());
         Location playerLoc = player.getLocation();
-        double yOffset = plugin.getConfig().getDouble("pet-settings.follow-height-offset", 0.5);
+
+        double yOffset = 1.2;
         double followDistance = plugin.getConfig().getDouble("pet-settings.follow-distance", 1.5);
 
         Location target = playerLoc.clone();
@@ -97,7 +99,7 @@ public class PetFollowTask extends BukkitRunnable {
                 target.add(direction.clone().multiply(-followDistance));
                 break;
             case ABOVE:
-                yOffset = 1.3;
+                yOffset = 2.0;
                 target.add(0, yOffset, 0);
                 break;
         }
@@ -126,7 +128,7 @@ public class PetFollowTask extends BukkitRunnable {
             Location particleLocation = pet.getLocation().add(0, 1.5, 0);
             pet.getWorld().spawnParticle(particle, particleLocation, amount, 0.2, 0.2, 0.2, 0);
         } catch (IllegalArgumentException e) {
-            // Silently fail if particle name is invalid to avoid console spam
+            // Falla silenciosamente
         }
     }
 

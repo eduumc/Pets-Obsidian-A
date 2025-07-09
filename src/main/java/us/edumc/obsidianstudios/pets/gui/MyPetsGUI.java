@@ -1,6 +1,5 @@
 package us.edumc.obsidianstudios.pets.gui;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,6 +16,7 @@ import java.util.List;
 
 public class MyPetsGUI {
 
+    public static final String GUI_TITLE = ChatUtil.translate("§aMis Mascotas");
     private final PetsObsidian plugin;
     private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
@@ -32,7 +32,7 @@ public class MyPetsGUI {
         int guiSize = Math.max(18, (int) (Math.ceil(ownedPets.size() / 9.0) * 9) + 9);
         if (guiSize > 54) guiSize = 54;
 
-        Inventory gui = Bukkit.createInventory(null, guiSize, "§aMis Mascotas");
+        Inventory gui = Bukkit.createInventory(null, guiSize, GUI_TITLE);
 
         for (String petId : ownedPets) {
             PetConfig petConfig = configManager.getPetConfig(petId);
@@ -43,7 +43,7 @@ public class MyPetsGUI {
 
         ItemStack backButton = new ItemStack(Material.BARRIER);
         ItemMeta backMeta = backButton.getItemMeta();
-        backMeta.displayName(ChatUtil.parse("<red>« Volver</red>"));
+        backMeta.setDisplayName(ChatUtil.translate("&c« Volver"));
         backButton.setItemMeta(backMeta);
         gui.setItem(guiSize - 5, backButton);
 

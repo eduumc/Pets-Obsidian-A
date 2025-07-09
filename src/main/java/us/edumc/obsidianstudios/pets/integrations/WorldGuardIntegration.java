@@ -12,13 +12,23 @@ import us.edumc.obsidianstudios.pets.PetsObsidian;
 
 public class WorldGuardIntegration {
 
-    public boolean isDenied(Player player) {
-        StateFlag flag = PetsObsidian.PETS_DENY_FLAG;
-        if (flag == null) return false;
+    /**
+     * Comprueba si las mascotas están permitidas en la ubicación del jugador.
+     * @param player El jugador a comprobar.
+     * @return true si están permitidas, false si la flag 'permitted-pets' está en DENY.
+     */
+    public boolean isAllowed(Player player) {
+        StateFlag flag = PetsObsidian.PERMITTED_PETS_FLAG;
+        if (flag == null) {
+            return true; // Si la flag no existe, se permite por defecto.
+        }
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         Location loc = player.getLocation();
         ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(loc));
+
+        // Retorna false solo si la flag está explícitamente en DENY.
+        // Si está en ALLOW (default) o no está establecida en la región, retorna true.
         return set.testState(null, flag);
     }
 }

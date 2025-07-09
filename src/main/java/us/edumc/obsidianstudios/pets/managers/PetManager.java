@@ -29,9 +29,14 @@ public class PetManager {
     }
 
     public void spawnPet(Player player, PetConfig config) {
+        if (plugin.getWorldGuardIntegration() != null && !plugin.getWorldGuardIntegration().isAllowed(player)) {
+            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("region-denied"));
+            return;
+        }
+
         if (hasPet(player)) {
             removePet(player);
-            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("pet-already-active"));
+            player.sendMessage(ChatUtil.translate(plugin.getConfigManager().getPrefixedMessage("pet-already-active")));
         }
 
         ArmorStand petEntity = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -51,7 +56,7 @@ public class PetManager {
         if (config.isShowDisplayName()) {
             String name = petData.getCustomName() != null ? petData.getCustomName() : config.getDisplayName();
             petEntity.setCustomName(ChatUtil.translate(name));
-            petEntity.setCustomNameVisible(true);
+            petEntity.setCustomNameVisible(petData.isDisplayNameVisible());
         }
 
         PetFollowTask followTask = new PetFollowTask(player, petEntity, config);

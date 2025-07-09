@@ -38,8 +38,9 @@ public class GUIListener implements Listener {
         String title = ChatColor.stripColor(event.getView().getTitle());
         boolean isMyPetsGUI = title.equals("Mis Mascotas");
         boolean isShopGUI = title.equals("Tienda de Mascotas");
+        boolean isManageGUI = title.equals("Gestionar Mascota");
 
-        if (!isMyPetsGUI && !isShopGUI) return;
+        if (!isMyPetsGUI && !isShopGUI && !isManageGUI) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
@@ -83,27 +84,25 @@ public class GUIListener implements Listener {
         }
 
         VaultIntegration vault = plugin.getVaultIntegration();
-        boolean economyEnabled = configManager.getConfig().getBoolean("economy.enabled", false);
+        double price = petConfig.getPrice();
 
-        if (economyEnabled) {
+        if (price > 0) {
             if (vault == null) {
                 plugin.getLogger().warning("La compra de mascotas falló porque Vault no está disponible o no hay un proveedor de economía.");
                 player.sendMessage(ChatColor.RED + "El sistema de economía no está funcionando. Contacta a un administrador.");
                 return;
             }
-            if (petConfig.getPrice() > 0) {
-                if (!vault.hasEnough(player, petConfig.getPrice())) {
-                    String message = configManager.getPrefixedMessage("not-enough-money")
-                            .replace("{price}", String.valueOf(petConfig.getPrice()));
-                    player.sendMessage(message);
-                    player.closeInventory();
-                    return;
-                }
-                if (!vault.withdraw(player, petConfig.getPrice())) {
-                    player.sendMessage(ChatUtil.translate("&cOcurrió un error durante la transacción. Inténtalo de nuevo."));
-                    player.closeInventory();
-                    return;
-                }
+            if (!vault.hasEnough(player, price)) {
+                String message = configManager.getPrefixedMessage("not-enough-money")
+                        .replace("{price}", String.valueOf(price));
+                player.sendMessage(message);
+                player.closeInventory();
+                return;
+            }
+            if (!vault.withdraw(player, price)) {
+                player.sendMessage(ChatUtil.translate("&cOcurrió un error durante la transacción. Inténtalo de nuevo."));
+                player.closeInventory();
+                return;
             }
         }
 

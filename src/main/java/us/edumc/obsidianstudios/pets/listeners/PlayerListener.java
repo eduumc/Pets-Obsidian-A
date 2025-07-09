@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -22,12 +24,13 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
+import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.models.Pet;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
+import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,6 +38,7 @@ public class PlayerListener implements Listener {
 
     private final PetsObsidian plugin;
     private final Map<UUID, Long> hitCooldowns = new HashMap<>();
+    private final Map<UUID, Map<UUID, Long>> playerKillCooldowns = new HashMap<>();
 
     public PlayerListener(PetsObsidian plugin) {
         this.plugin = plugin;
@@ -73,12 +77,9 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        if (!petConfig.hasPermission(player)) {
-            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("no-permission"));
-            return;
-        }
+        plugin.getPlayerDataManager().addPet(player, petId);
+        player.sendMessage(ChatUtil.translate("&aHas reclamado la mascota " + petConfig.getDisplayName() + "&a!"));
 
-        plugin.getPetManager().spawnPet(player, petConfig);
         item.setAmount(item.getAmount() - 1);
     }
 
@@ -120,6 +121,50 @@ public class PlayerListener implements Listener {
                 plugin.getLogger().warning("Efecto de golpeo mal configurado: " + effectString);
             }
         }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        Player killer = entity.getKiller();
+
+        if (killer == null) return;
+
+        Pet activePet = plugin.getPetManager().getActivePet(killer);
+        if (activePet == null) return;
+
+        PetLevelManager levelManager = plugin.getPetLevelManager();
+        double xpAmount = 0;
+
+        if (entity instanceof Monster) {
+            xpAmount = plugin.getConfigManager().getLevelsConfig().getDouble("xp-sources.mob-kill", 5.0);
+        } else if (entity instanceof Player) {
+            Player victim = (Player) entity;
+            if (canGetPlayerXp(killer.getUniqueId(), victim.getUniqueId())) {
+                xpAmount = plugin.getConfigManager().getLevelsConfig().getDouble("xp-sources.player-kill", 25.0);
+                updatePlayerKillCooldown(killer.getUniqueId(), victim.getUniqueId());
+            }
+        }
+
+        if (xpAmount > 0) {
+            levelManager.addXp(killer, activePet, xpAmount);
+        }
+    }
+
+    private boolean canGetPlayerXp(UUID killerId, UUID victimId) {
+        long cooldown = plugin.getConfigManager().getLevelsConfig().getLong("anti-abuse.player-kill-cooldown-seconds", 300) * 1000;
+        long currentTime = System.currentTimeMillis();
+
+        Map<UUID, Long> victimCooldowns = playerKillCooldowns.getOrDefault(killerId, new HashMap<>());
+        long lastKillTime = victimCooldowns.getOrDefault(victimId, 0L);
+
+        return currentTime - lastKillTime > cooldown;
+    }
+
+    private void updatePlayerKillCooldown(UUID killerId, UUID victimId) {
+        Map<UUID, Long> victimCooldowns = playerKillCooldowns.getOrDefault(killerId, new HashMap<>());
+        victimCooldowns.put(victimId, System.currentTimeMillis());
+        playerKillCooldowns.put(killerId, victimCooldowns);
     }
 
     private boolean isPet(Entity entity) {

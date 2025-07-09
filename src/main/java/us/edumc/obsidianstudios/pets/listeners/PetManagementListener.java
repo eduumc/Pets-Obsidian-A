@@ -1,13 +1,17 @@
 package us.edumc.obsidianstudios.pets.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.gui.MyPetsGUI;
+import us.edumc.obsidianstudios.pets.gui.PetLevelGUI;
 import us.edumc.obsidianstudios.pets.gui.PetManagementGUI;
 import us.edumc.obsidianstudios.pets.managers.ConfigManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
@@ -42,7 +46,7 @@ public class PetManagementListener implements Listener {
 
     @EventHandler
     public void onManageMenuClick(InventoryClickEvent event) {
-        if (!ChatColor.stripColor(event.getView().getTitle()).equals("Gestionar Mascota")) return;
+        if (!event.getView().getTitle().equals(PetManagementGUI.GUI_TITLE)) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
@@ -65,6 +69,10 @@ public class PetManagementListener implements Listener {
             cycleFollowStyle(player, petData);
         } else if (buttonName.contains("Activar/Desactivar Partículas")) {
             toggleParticles(player, petData);
+        } else if (buttonName.contains("Activar/Desactivar Nombre")) {
+            toggleDisplayName(player, petData);
+        } else if (buttonName.contains("Ver Nivel")) {
+            new PetLevelGUI(plugin).open(player, petId);
         } else if (buttonName.contains("Volver a Mis Mascotas")) {
             new MyPetsGUI(plugin).open(player);
         } else if (buttonName.contains("Invocar Mascota")) {
@@ -93,7 +101,7 @@ public class PetManagementListener implements Listener {
 
     private void handleRename(Player player, String petId) {
         player.closeInventory();
-        player.sendMessage(ChatUtil.translate("&6Escribe el nuevo nombre para tu mascota en el chat. Usa códigos de color (&) o formato MiniMessage. Escribe 'cancelar' para salir."));
+        player.sendMessage(ChatUtil.translate("&6Escribe el nuevo nombre para tu mascota en el chat. Usa códigos de color (&). Escribe 'cancelar' para salir."));
         playerNamingMap.put(player.getUniqueId(), petId);
     }
 
@@ -122,14 +130,22 @@ public class PetManagementListener implements Listener {
         new PetManagementGUI(plugin).open(player, petData.getPetId());
     }
 
-    private String extractPetId(ItemStack item) {
-        if (item.getItemMeta() == null || item.getItemMeta().getLore() == null) return null;
-        for (String line : item.getItemMeta().getLore()) {
-            String strippedLine = ChatColor.stripColor(line);
-            if (strippedLine.startsWith("ID: ")) {
-                return strippedLine.substring(4);
-            }
+    private void toggleDisplayName(Player player, PlayerPetData petData) {
+        petData.setDisplayNameVisible(!petData.isDisplayNameVisible());
+        playerDataManager.savePetData(player, petData);
+        player.sendMessage(ChatUtil.translate("&aVisibilidad del nombre: " + (petData.isDisplayNameVisible() ? "&bActivada" : "&cDesactivada")));
+
+        if (petManager.hasPet(player) && petManager.getActivePet(player).getConfig().getId().equals(petData.getPetId())) {
+            petManager.getActivePet(player).updateNameVisibility(petData.isDisplayNameVisible());
         }
-        return null;
+
+        new PetManagementGUI(plugin).open(player, petData.getPetId());
+    }
+
+    private String extractPetId(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+        NamespacedKey key = new NamespacedKey(plugin, "pet-id");
+        return meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
     }
 }

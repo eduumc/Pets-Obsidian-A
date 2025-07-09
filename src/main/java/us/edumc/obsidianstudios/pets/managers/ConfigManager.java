@@ -17,6 +17,7 @@ public class ConfigManager {
 
     private final PetsObsidian plugin;
     private FileConfiguration config;
+    private FileConfiguration levelsConfig; // Nuevo
     private final Map<String, PetConfig> petConfigs = new HashMap<>();
 
     public ConfigManager(PetsObsidian plugin) {
@@ -28,6 +29,15 @@ public class ConfigManager {
         plugin.reloadConfig();
         config = plugin.getConfig();
         loadPetConfigs();
+        loadLevelsConfig(); // Nuevo
+    }
+
+    private void loadLevelsConfig() {
+        File levelsFile = new File(plugin.getDataFolder(), "levels.yml");
+        if (!levelsFile.exists()) {
+            plugin.saveResource("levels.yml", false);
+        }
+        levelsConfig = YamlConfiguration.loadConfiguration(levelsFile);
     }
 
     private void loadPetConfigs() {
@@ -83,6 +93,7 @@ public class ConfigManager {
     }
 
     public FileConfiguration getConfig() { return config; }
+    public FileConfiguration getLevelsConfig() { return levelsConfig; } // Nuevo
     public PetConfig getPetConfig(String id) { return petConfigs.get(id); }
     public Map<String, PetConfig> getAllPetConfigs() { return petConfigs; }
 }

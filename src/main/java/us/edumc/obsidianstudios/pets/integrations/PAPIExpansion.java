@@ -18,7 +18,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
     @Override
     public @NotNull String getIdentifier() { return "pet"; }
     @Override
-    public @NotNull String getAuthor() { return "edumc_"; }
+    public @NotNull String getAuthor() { return "eduumc"; }
     @Override
     public @NotNull String getVersion() { return "1.0.0"; }
     @Override
