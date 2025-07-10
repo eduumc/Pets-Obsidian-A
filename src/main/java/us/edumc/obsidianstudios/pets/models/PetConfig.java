@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class PetConfig {
+public class  PetConfig {
 
     private final String id;
     private final String displayName;

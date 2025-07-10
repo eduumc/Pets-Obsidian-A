@@ -17,7 +17,6 @@ public class ConfigManager {
 
     private final PetsObsidian plugin;
     private FileConfiguration config;
-    private FileConfiguration levelsConfig; // Nuevo
     private final Map<String, PetConfig> petConfigs = new HashMap<>();
 
     public ConfigManager(PetsObsidian plugin) {
@@ -29,15 +28,6 @@ public class ConfigManager {
         plugin.reloadConfig();
         config = plugin.getConfig();
         loadPetConfigs();
-        loadLevelsConfig(); // Nuevo
-    }
-
-    private void loadLevelsConfig() {
-        File levelsFile = new File(plugin.getDataFolder(), "levels.yml");
-        if (!levelsFile.exists()) {
-            plugin.saveResource("levels.yml", false);
-        }
-        levelsConfig = YamlConfiguration.loadConfiguration(levelsFile);
     }
 
     private void loadPetConfigs() {
@@ -77,7 +67,13 @@ public class ConfigManager {
                     particles = particleSection.getValues(false);
                 }
 
-                PetConfig petConfig = new PetConfig(id, displayName, showDisplayName, lore, headType, headTexture, price, permission, effects, onHitEffects, onHitCooldown, particles, showInShop);
+                Map<String, Object> rewards = new HashMap<>();
+                ConfigurationSection rewardsSection = petYml.getConfigurationSection("rewards");
+                if (rewardsSection != null) {
+                    rewards = rewardsSection.getValues(true);
+                }
+
+                PetConfig petConfig = new PetConfig(id, displayName, showDisplayName, lore, headType, headTexture, price, permission, effects, onHitEffects, onHitCooldown, particles, showInShop, rewards);
                 petConfigs.put(id, petConfig);
             } catch (Exception e) {
                 plugin.getLogger().log(Level.SEVERE, "Error al cargar el archivo de mascota: " + petFile.getName(), e);
@@ -93,7 +89,6 @@ public class ConfigManager {
     }
 
     public FileConfiguration getConfig() { return config; }
-    public FileConfiguration getLevelsConfig() { return levelsConfig; } // Nuevo
     public PetConfig getPetConfig(String id) { return petConfigs.get(id); }
     public Map<String, PetConfig> getAllPetConfigs() { return petConfigs; }
 }

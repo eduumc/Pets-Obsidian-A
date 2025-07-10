@@ -15,6 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -24,7 +25,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
-import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.models.Pet;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
@@ -51,6 +51,17 @@ public class PlayerListener implements Listener {
             plugin.getPetManager().removePet(player);
         }
     }
+
+    // ================== CORRECCIÓN AQUÍ ==================
+    // Se ha añadido el listener para la muerte del jugador.
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (plugin.getPetManager().hasPet(player)) {
+            plugin.getPetManager().removePet(player);
+        }
+    }
+    // =====================================================
 
     @EventHandler
     public void onPetItemClick(PlayerInteractEvent event) {

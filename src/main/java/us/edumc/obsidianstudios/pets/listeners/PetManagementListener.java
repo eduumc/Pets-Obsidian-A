@@ -11,7 +11,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.gui.MyPetsGUI;
-import us.edumc.obsidianstudios.pets.gui.PetLevelGUI;
 import us.edumc.obsidianstudios.pets.gui.PetManagementGUI;
 import us.edumc.obsidianstudios.pets.managers.ConfigManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
@@ -71,8 +70,6 @@ public class PetManagementListener implements Listener {
             toggleParticles(player, petData);
         } else if (buttonName.contains("Activar/Desactivar Nombre")) {
             toggleDisplayName(player, petData);
-        } else if (buttonName.contains("Ver Nivel")) {
-            new PetLevelGUI(plugin).open(player, petId);
         } else if (buttonName.contains("Volver a Mis Mascotas")) {
             new MyPetsGUI(plugin).open(player);
         } else if (buttonName.contains("Invocar Mascota")) {

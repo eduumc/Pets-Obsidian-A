@@ -1,10 +1,18 @@
+# Archivo: config.yml
 prefix: "&d&lPets &8» &r"
 shop:
   enabled: true
 pet-settings:
-  default-speed: 0.35
   follow-distance: 1.5
-  follow-height-offset: 0.5
+  follow-height-offset: 1.2
+level-settings:
+  level-xp-formula: "100 * level"
+  xp-sources:
+    passive-xp-per-minute: 10.0
+    mob-kill: 5.0
+    player-kill: 25.0
+  anti-abuse:
+    player-kill-cooldown-seconds: 300
 messages:
   no-permission: "&cNo tienes permiso para ejecutar este comando."
   player-only-command: "&cEste comando solo puede ser ejecutado por un jugador."
@@ -16,10 +24,10 @@ messages:
   not-enough-money: "&cNo tienes suficiente dinero. Necesitas &e${price}&c."
   region-denied: "&cNo puedes usar tu mascota en esta zona."
   config-reloaded: "&aLa configuración de Pets-Obsidian ha sido recargada."
-  give-usage: "&cModo de uso: /pet give <usuario> <id_mascota>"
+  give-usage: "&cModo de uso: /pet give <usuario> <id_mascota> <egg|pet>"
   give-no-pet-found: "&cNo se encontró una mascota con ese ID."
   give-success: "&aHas dado la mascota {pet_name} &aa &e{player_name}&a."
-  give-received: "&aHas recibido la mascota {pet_name}&a."
+  give-received: "&aHas recibido un invocador para la mascota {pet_name}&a."
   delete-usage: "&cModo de uso: /pet delete <usuario> <id_mascota>"
   delete-not-owned: "&cEse jugador no posee la mascota '{pet_id}'."
   delete-success: "&aHas quitado la mascota '{pet_id}' a {player_name}."
@@ -28,11 +36,10 @@ messages:
   spawn-no-config: "&cError: No se encontró la configuración para esa mascota."
   pet-info-header: "&6&m----------------------------------------"
   pet-info-body:
-    - "&eInformación de la mascota &d{pet_name}"
+    - "&eInformación de tu mascota &d{pet_name}"
     - " "
-    - " &7ID: &f{pet_id}"
-    - " &7Permiso: &f{pet_permission}"
-    - " &7Precio: &a${pet_price}"
+    - " &7Nivel: &e{pet_level}"
+    - " &7Experiencia: &a{pet_xp}"
     - " &7Efectos Pasivos: &b{pet_effects}"
     - " &7Efectos de Combate: &c{pet_on_hit_effects}"
     - " &7Partículas: &b{pet_particles}"

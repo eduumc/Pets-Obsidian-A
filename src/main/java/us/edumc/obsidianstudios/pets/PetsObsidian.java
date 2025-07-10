@@ -33,7 +33,7 @@ public final class PetsObsidian extends JavaPlugin {
     private ConfigManager configManager;
     private PetManager petManager;
     private PlayerDataManager playerDataManager;
-    private PetLevelManager petLevelManager; // Nuevo manager
+    private PetLevelManager petLevelManager;
     private VaultIntegration vaultIntegration;
     private WorldGuardIntegration worldGuardIntegration;
     public static StateFlag PERMITTED_PETS_FLAG;
@@ -62,7 +62,7 @@ public final class PetsObsidian extends JavaPlugin {
         this.configManager = new ConfigManager(this);
         configManager.loadConfigs();
         this.playerDataManager = new PlayerDataManager(this);
-        this.petLevelManager = new PetLevelManager(this); // Inicializar el nuevo manager
+        this.petLevelManager = new PetLevelManager(this);
         this.petManager = new PetManager(this);
 
         setupIntegrations();
@@ -118,7 +118,7 @@ public final class PetsObsidian extends JavaPlugin {
     public ConfigManager getConfigManager() { return configManager; }
     public PetManager getPetManager() { return petManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
-    public PetLevelManager getPetLevelManager() { return petLevelManager; } // Getter para el nuevo manager
+    public PetLevelManager getPetLevelManager() { return petLevelManager; }
     public VaultIntegration getVaultIntegration() { return vaultIntegration; }
     public WorldGuardIntegration getWorldGuardIntegration() { return worldGuardIntegration; }
     public Map<UUID, String> getPlayerNamingMap() { return playerNamingMap; }

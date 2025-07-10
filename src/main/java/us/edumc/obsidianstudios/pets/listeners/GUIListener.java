@@ -36,11 +36,15 @@ public class GUIListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         String title = ChatColor.stripColor(event.getView().getTitle());
-        boolean isMyPetsGUI = title.equals("Mis Mascotas");
-        boolean isShopGUI = title.equals("Tienda de Mascotas");
-        boolean isManageGUI = title.equals("Gestionar Mascota");
 
-        if (!isMyPetsGUI && !isShopGUI && !isManageGUI) return;
+        // ================== CORRECCIÓN AQUÍ ==================
+        // Se ha añadido la comprobación para el menú de niveles.
+        boolean isMyPetsGUI = title.equals(ChatColor.stripColor(MyPetsGUI.GUI_TITLE));
+        boolean isShopGUI = title.equals(ChatColor.stripColor(ShopGUI.GUI_TITLE));
+        boolean isLevelGUI = title.equals(ChatColor.stripColor(PetLevelGUI.GUI_TITLE));
+
+        if (!isMyPetsGUI && !isShopGUI && !isLevelGUI) return;
+        // =====================================================
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
