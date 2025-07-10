@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MyPetsGUI {
 
-    public static final String GUI_TITLE = ChatUtil.translate("§aMis Mascotas");
+    public static final String GUI_TITLE = ChatUtil.translate("§8Mis Mascotas");
     private final PetsObsidian plugin;
     private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
@@ -41,7 +41,7 @@ public class MyPetsGUI {
             }
         }
 
-        ItemStack backButton = new ItemStack(Material.BARRIER);
+        ItemStack backButton = new ItemStack(Material.ARROW);
         ItemMeta backMeta = backButton.getItemMeta();
         backMeta.setDisplayName(ChatUtil.translate("&c« Volver"));
         backButton.setItemMeta(backMeta);

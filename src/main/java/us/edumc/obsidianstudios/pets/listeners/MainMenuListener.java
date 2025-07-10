@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
+import us.edumc.obsidianstudios.pets.gui.MainMenuGUI;
 import us.edumc.obsidianstudios.pets.gui.MyPetsGUI;
 import us.edumc.obsidianstudios.pets.gui.ShopGUI;
 

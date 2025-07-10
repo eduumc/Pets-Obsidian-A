@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class ShopGUI {
 
-    public static final String GUI_TITLE = ChatUtil.translate("§eTienda de Mascotas");
+    public static final String GUI_TITLE = ChatUtil.translate("§8Tienda de Mascotas");
     private final PetsObsidian plugin;
     private final ConfigManager configManager;
     private final PlayerDataManager playerDataManager;
@@ -58,7 +58,7 @@ public class ShopGUI {
             gui.addItem(item);
         }
 
-        ItemStack backButton = new ItemStack(Material.BARRIER);
+        ItemStack backButton = new ItemStack(Material.ARROW);
         ItemMeta backMeta = backButton.getItemMeta();
         backMeta.setDisplayName(ChatUtil.translate("&c« Volver"));
         backButton.setItemMeta(backMeta);

@@ -1,7 +1,6 @@
 package us.edumc.obsidianstudios.pets.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -65,10 +64,7 @@ public class PetCommand implements CommandExecutor, TabCompleter {
                 if (isPlayer(sender)) handleSpawn((Player) sender, args);
                 break;
             case "info":
-                // ================== CORRECCIÓN AQUÍ ==================
-                // Ahora se necesita ser un jugador para usar /pet info
                 if (isPlayer(sender)) handleInfo((Player) sender, args);
-                // =====================================================
                 break;
             case "give":
                 handleGive(sender, args);
@@ -117,13 +113,13 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 3 && (args[0].equalsIgnoreCase("give"))) {
-            return Arrays.asList("egg", "pet").stream()
+            return configManager.getAllPetConfigs().keySet().stream()
                     .filter(s -> s.startsWith(args[2].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
         if (args.length == 4 && args[0].equalsIgnoreCase("give")) {
-            return configManager.getAllPetConfigs().keySet().stream()
+            return Arrays.asList("egg", "pet").stream()
                     .filter(s -> s.startsWith(args[3].toLowerCase()))
                     .collect(Collectors.toList());
         }

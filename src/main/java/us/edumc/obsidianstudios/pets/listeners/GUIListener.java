@@ -37,14 +37,10 @@ public class GUIListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         String title = ChatColor.stripColor(event.getView().getTitle());
 
-        // ================== CORRECCIÓN AQUÍ ==================
-        // Se ha añadido la comprobación para el menú de niveles.
         boolean isMyPetsGUI = title.equals(ChatColor.stripColor(MyPetsGUI.GUI_TITLE));
         boolean isShopGUI = title.equals(ChatColor.stripColor(ShopGUI.GUI_TITLE));
-        boolean isLevelGUI = title.equals(ChatColor.stripColor(PetLevelGUI.GUI_TITLE));
 
-        if (!isMyPetsGUI && !isShopGUI && !isLevelGUI) return;
-        // =====================================================
+        if (!isMyPetsGUI && !isShopGUI) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
@@ -52,7 +48,7 @@ public class GUIListener implements Listener {
 
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
-        if (clickedItem.getType() == Material.BARRIER) {
+        if (clickedItem.getType() == Material.ARROW) {
             new MainMenuGUI(plugin).open(player);
             return;
         }
@@ -69,9 +65,7 @@ public class GUIListener implements Listener {
 
         if (isMyPetsGUI) {
             new PetManagementGUI(plugin).open(player, petId);
-        }
-
-        if (isShopGUI) {
+        } else if (isShopGUI) {
             if (playerDataManager.getOwnedPets(player).contains(petId)) {
                 player.sendMessage(ChatUtil.translate("&6Ya posees esta mascota. Puedes gestionarla desde 'Mis Mascotas'."));
             } else {

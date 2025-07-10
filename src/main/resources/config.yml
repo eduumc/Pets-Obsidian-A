@@ -13,6 +13,12 @@ level-settings:
     player-kill: 25.0
   anti-abuse:
     player-kill-cooldown-seconds: 300
+gui-settings:
+  enable-rename: true
+  enable-particle-change: true
+  enable-follow-style-change: true
+  enable-particle-toggle: true
+  enable-name-toggle: true
 messages:
   no-permission: "&cNo tienes permiso para ejecutar este comando."
   player-only-command: "&cEste comando solo puede ser ejecutado por un jugador."

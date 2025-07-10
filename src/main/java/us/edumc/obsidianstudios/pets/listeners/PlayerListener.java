@@ -25,6 +25,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
+import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.models.Pet;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
@@ -52,8 +53,6 @@ public class PlayerListener implements Listener {
         }
     }
 
-    // ================== CORRECCIÓN AQUÍ ==================
-    // Se ha añadido el listener para la muerte del jugador.
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
@@ -61,7 +60,6 @@ public class PlayerListener implements Listener {
             plugin.getPetManager().removePet(player);
         }
     }
-    // =====================================================
 
     @EventHandler
     public void onPetItemClick(PlayerInteractEvent event) {
@@ -148,11 +146,11 @@ public class PlayerListener implements Listener {
         double xpAmount = 0;
 
         if (entity instanceof Monster) {
-            xpAmount = plugin.getConfigManager().getLevelsConfig().getDouble("xp-sources.mob-kill", 5.0);
+            xpAmount = plugin.getConfigManager().getConfig().getDouble("level-settings.xp-sources.mob-kill", 5.0);
         } else if (entity instanceof Player) {
             Player victim = (Player) entity;
             if (canGetPlayerXp(killer.getUniqueId(), victim.getUniqueId())) {
-                xpAmount = plugin.getConfigManager().getLevelsConfig().getDouble("xp-sources.player-kill", 25.0);
+                xpAmount = plugin.getConfigManager().getConfig().getDouble("level-settings.xp-sources.player-kill", 25.0);
                 updatePlayerKillCooldown(killer.getUniqueId(), victim.getUniqueId());
             }
         }
@@ -163,7 +161,7 @@ public class PlayerListener implements Listener {
     }
 
     private boolean canGetPlayerXp(UUID killerId, UUID victimId) {
-        long cooldown = plugin.getConfigManager().getLevelsConfig().getLong("anti-abuse.player-kill-cooldown-seconds", 300) * 1000;
+        long cooldown = plugin.getConfigManager().getConfig().getLong("level-settings.anti-abuse.player-kill-cooldown-seconds", 300) * 1000;
         long currentTime = System.currentTimeMillis();
 
         Map<UUID, Long> victimCooldowns = playerKillCooldowns.getOrDefault(killerId, new HashMap<>());

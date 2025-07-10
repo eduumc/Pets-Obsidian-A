@@ -17,15 +17,15 @@ import org.bukkit.profile.PlayerTextures;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class  PetConfig {
+public class PetConfig {
 
     private final String id;
     private final String displayName;
@@ -40,8 +40,9 @@ public class  PetConfig {
     private final int onHitCooldown;
     private final Map<String, Object> particles;
     private final boolean showInShop;
+    private final Map<String, Object> rewards;
 
-    public PetConfig(String id, String displayName, boolean showDisplayName, List<String> lore, String headType, String headTexture, double price, String permission, List<String> effects, List<String> onHitEffects, int onHitCooldown, Map<String, Object> particles, boolean showInShop) {
+    public PetConfig(String id, String displayName, boolean showDisplayName, List<String> lore, String headType, String headTexture, double price, String permission, List<String> effects, List<String> onHitEffects, int onHitCooldown, Map<String, Object> particles, boolean showInShop, Map<String, Object> rewards) {
         this.id = id;
         this.displayName = displayName;
         this.showDisplayName = showDisplayName;
@@ -55,6 +56,7 @@ public class  PetConfig {
         this.onHitCooldown = onHitCooldown;
         this.particles = particles;
         this.showInShop = showInShop;
+        this.rewards = rewards;
     }
 
     public ItemStack createHead() {
@@ -135,4 +137,5 @@ public class  PetConfig {
     public List<String> getEffects() { return effects; }
     public Map<String, Object> getParticles() { return particles; }
     public boolean isShowInShop() { return showInShop; }
+    public Map<String, Object> getRewards() { return rewards; }
 }

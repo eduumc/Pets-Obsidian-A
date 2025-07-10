@@ -2,10 +2,12 @@ package us.edumc.obsidianstudios.pets.managers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.models.Pet;
@@ -15,6 +17,7 @@ import us.edumc.obsidianstudios.pets.tasks.PetFollowTask;
 import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +39,6 @@ public class PetManager {
 
         if (hasPet(player)) {
             removePet(player);
-            player.sendMessage(ChatUtil.translate(plugin.getConfigManager().getPrefixedMessage("pet-already-active")));
         }
 
         ArmorStand petEntity = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -75,6 +77,7 @@ public class PetManager {
         if (pet != null) {
             pet.remove();
             clearPetEffects(player, pet.getConfig());
+            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("pet-removed"));
         }
     }
 
@@ -92,16 +95,56 @@ public class PetManager {
     }
 
     private void clearPetEffects(Player player, PetConfig config) {
-        if (config.getEffects() == null) return;
-        for (String effectString : config.getEffects()) {
-            try {
-                String[] parts = effectString.split(":");
-                PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
-                if (type != null && player.hasPotionEffect(type)) {
-                    player.removePotionEffect(type);
-                }
-            } catch (Exception ignored) {}
+        // Eliminar efectos base
+        if (config.getEffects() != null) {
+            for (String effectString : config.getEffects()) {
+                try {
+                    String[] parts = effectString.split(":");
+                    PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+                    int amplifier = Integer.parseInt(parts[1]);
+                    if (type != null) {
+                        PotionEffect activeEffect = player.getPotionEffect(type);
+                        if (activeEffect != null && activeEffect.getAmplifier() == amplifier) {
+                            player.removePotionEffect(type);
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
         }
+
+        // ================== CORRECCIÓN AQUÍ ==================
+        // Ahora se eliminan los efectos de las recompensas por nivel correctamente.
+        PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, config.getId());
+        Map<String, Object> rewards = config.getRewards();
+        if (rewards != null) {
+            for (int i = 1; i <= petData.getLevel(); i++) {
+                String levelKey = "rewards." + i;
+                if (rewards.containsKey(levelKey)) {
+                    // El valor es una ConfigurationSection, así que la obtenemos.
+                    Object rawData = rewards.get(levelKey);
+                    if (rawData instanceof ConfigurationSection) {
+                        ConfigurationSection rewardsSection = (ConfigurationSection) rawData;
+                        List<String> effects = rewardsSection.getStringList("effects");
+                        if (effects != null) {
+                            for (String effectString : effects) {
+                                try {
+                                    String[] parts = effectString.split(":");
+                                    PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+                                    int amplifier = Integer.parseInt(parts[1]);
+                                    if (type != null) {
+                                        PotionEffect activeEffect = player.getPotionEffect(type);
+                                        if (activeEffect != null && activeEffect.getAmplifier() == amplifier) {
+                                            player.removePotionEffect(type);
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // =====================================================
     }
 
     public boolean hasPet(Player player) {
