@@ -1,4 +1,6 @@
 # Archivo: config.yml
+license:
+  key: "" # Dejar en blanco
 prefix: "&x&F&F&0&0&E&3&lP&x&F&A&1&8&E&C&lE&x&F&4&3&1&F&6&lT&x&E&F&4&9&F&F&lS &8» &r"
 shop:
   enabled: true
