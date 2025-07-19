@@ -1,5 +1,5 @@
 name: Pets-Obsidian
-version: '1.1.0'
+version: '1.1.3'
 main: us.edumc.obsidianstudios.pets.PetsObsidian
 api-version: '1.19'
 authors: [EduMC_]
@@ -20,6 +20,9 @@ permissions:
     default: op
   pet.admin.delete:
     description: Permite quitarle una mascota a un jugador.
+    default: op
+  pet.admin.level:
+    description: Permite modificar el nivel de las mascotas de los jugadores.
     default: op
   pet.use.*:
     description: Permite usar todas las mascotas.

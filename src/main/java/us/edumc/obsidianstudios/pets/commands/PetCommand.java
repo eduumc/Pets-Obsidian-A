@@ -15,6 +15,7 @@ import us.edumc.obsidianstudios.pets.PetsObsidian;
 import us.edumc.obsidianstudios.pets.gui.MainMenuGUI;
 import us.edumc.obsidianstudios.pets.gui.ShopGUI;
 import us.edumc.obsidianstudios.pets.managers.ConfigManager;
+import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.managers.PlayerDataManager;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
@@ -33,12 +34,14 @@ public class PetCommand implements CommandExecutor, TabCompleter {
     private final ConfigManager configManager;
     private final PetManager petManager;
     private final PlayerDataManager playerDataManager;
+    private final PetLevelManager petLevelManager;
 
     public PetCommand(PetsObsidian plugin) {
         this.plugin = plugin;
         this.configManager = plugin.getConfigManager();
         this.petManager = plugin.getPetManager();
         this.playerDataManager = plugin.getPlayerDataManager();
+        this.petLevelManager = plugin.getPetLevelManager();
     }
 
     @Override
@@ -75,6 +78,9 @@ public class PetCommand implements CommandExecutor, TabCompleter {
             case "reload":
                 handleReload(sender);
                 break;
+            case "level":
+                handleLevel(sender, args);
+                break;
             case "help":
             default:
                 sendHelpMessage(sender);
@@ -90,49 +96,76 @@ public class PetCommand implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("pet.admin.give")) subCommands.add("give");
             if (sender.hasPermission("pet.admin.delete")) subCommands.add("delete");
             if (sender.hasPermission("pet.admin.reload")) subCommands.add("reload");
-
+            if (sender.hasPermission("pet.admin.level")) subCommands.add("level");
             return subCommands.stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
+        String subCommand = args[0].toLowerCase();
+
         if (args.length == 2) {
-            String subCommand = args[0].toLowerCase();
-            if (subCommand.equals("spawn") || subCommand.equals("info")) {
-                if(sender instanceof Player) {
-                    return playerDataManager.getOwnedPets((Player) sender).stream()
-                            .filter(s -> s.startsWith(args[1].toLowerCase()))
+            switch (subCommand) {
+                case "spawn":
+                case "info":
+                    if (sender instanceof Player) {
+                        return playerDataManager.getOwnedPets((Player) sender).stream()
+                                .filter(s -> s.startsWith(args[1].toLowerCase()))
+                                .collect(Collectors.toList());
+                    }
+                    break;
+                case "give":
+                case "delete":
+                case "level":
+                    return Bukkit.getOnlinePlayers().stream().map(Player::getName)
+                            .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                             .collect(Collectors.toList());
-                }
-            }
-            if (subCommand.equals("give") || subCommand.equals("delete")) {
-                return Bukkit.getOnlinePlayers().stream().map(Player::getName)
-                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
-                        .collect(Collectors.toList());
             }
         }
 
-        if (args.length == 3 && (args[0].equalsIgnoreCase("give"))) {
-            return configManager.getAllPetConfigs().keySet().stream()
-                    .filter(s -> s.startsWith(args[2].toLowerCase()))
-                    .collect(Collectors.toList());
+        if (args.length == 3) {
+            switch (subCommand) {
+                case "give":
+                    return configManager.getAllPetConfigs().keySet().stream()
+                            .filter(s -> s.startsWith(args[2].toLowerCase()))
+                            .collect(Collectors.toList());
+                case "delete":
+                    Player targetDelete = Bukkit.getPlayer(args[1]);
+                    if (targetDelete != null) {
+                        return playerDataManager.getOwnedPets(targetDelete).stream()
+                                .filter(s -> s.startsWith(args[2].toLowerCase()))
+                                .collect(Collectors.toList());
+                    }
+                    break;
+                case "level":
+                    return Arrays.asList("set", "give", "remove").stream()
+                            .filter(s -> s.startsWith(args[2].toLowerCase()))
+                            .collect(Collectors.toList());
+            }
         }
 
-        if (args.length == 4 && args[0].equalsIgnoreCase("give")) {
-            return Arrays.asList("egg", "pet").stream()
-                    .filter(s -> s.startsWith(args[3].toLowerCase()))
-                    .collect(Collectors.toList());
+        if (args.length == 4) {
+            switch (subCommand) {
+                case "give":
+                    return Arrays.asList("physical", "pet").stream()
+                            .filter(s -> s.startsWith(args[3].toLowerCase()))
+                            .collect(Collectors.toList());
+                case "level":
+                    Player targetLevel = Bukkit.getPlayer(args[1]);
+                    if (targetLevel != null) {
+                        return playerDataManager.getOwnedPets(targetLevel).stream()
+                                .filter(s -> s.startsWith(args[3].toLowerCase()))
+                                .collect(Collectors.toList());
+                    }
+                    break;
+            }
+        }
+
+        if (args.length == 5 && subCommand.equals("level")) {
+            return Collections.singletonList("<cantidad>");
         }
 
         return Collections.emptyList();
-    }
-
-    private boolean isPlayer(CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(configManager.getPrefixedMessage("player-only-command"));
-            return false;
-        }
-        return true;
     }
 
     private void handleGive(CommandSender sender, String[] args) {
@@ -141,7 +174,7 @@ public class PetCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (args.length < 4) {
-            sender.sendMessage(ChatUtil.translate("&cUso: /pet give <jugador> <id_mascota> <egg|pet>"));
+            sender.sendMessage(ChatUtil.translate("&cUso: /pet give <jugador> <id_mascota> <physical|pet>"));
             return;
         }
         Player target = Bukkit.getPlayer(args[1]);
@@ -159,8 +192,8 @@ public class PetCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        if (type.equals("egg")) {
-            ItemStack petSpawner = petConfig.createHead();
+        if (type.equals("physical")) {
+            ItemStack petSpawner = petConfig.createHead(); // Crea la cabeza de la mascota
             ItemMeta meta = petSpawner.getItemMeta();
             meta.setDisplayName(ChatUtil.translate("&aInvocador de Mascota: " + petConfig.getDisplayName()));
             meta.setLore(Collections.singletonList(ChatUtil.translate("&7¡Haz clic derecho para reclamar esta mascota!")));
@@ -170,7 +203,7 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         } else if (type.equals("pet")) {
             playerDataManager.addPet(target, petId);
         } else {
-            sender.sendMessage(ChatUtil.translate("&cTipo inválido. Usa 'egg' o 'pet'."));
+            sender.sendMessage(ChatUtil.translate("&cTipo inválido. Usa 'physical' o 'pet'."));
             return;
         }
 
@@ -179,6 +212,93 @@ public class PetCommand implements CommandExecutor, TabCompleter {
                 .replace("{player_name}", target.getName())));
         target.sendMessage(ChatUtil.translate(configManager.getPrefixedMessage("give-received")
                 .replace("{pet_name}", petConfig.getDisplayName())));
+    }
+
+    private void sendHelpMessage(CommandSender sender) {
+        sender.sendMessage(ChatUtil.translate("&6--- Ayuda de Pets-Obsidian ---"));
+        sender.sendMessage(ChatUtil.translate("&e/pets &7- Abre el menú principal de mascotas."));
+        sender.sendMessage(ChatUtil.translate("&e/pet shop &7- Abre la tienda de mascotas."));
+        sender.sendMessage(ChatUtil.translate("&e/pet spawn <id> &7- Invoca una mascota que posees."));
+        sender.sendMessage(ChatUtil.translate("&e/pet remove &7- Guarda tu mascota activa."));
+        sender.sendMessage(ChatUtil.translate("&e/pet info <id> &7- Muestra información de una mascota."));
+        if (sender.hasPermission("pet.admin.give")) {
+            sender.sendMessage(ChatUtil.translate("&e/pet give <usuario> <id> <physical|pet> &7- Da una mascota a un jugador."));
+        }
+        if (sender.hasPermission("pet.admin.delete")) {
+            sender.sendMessage(ChatUtil.translate("&e/pet delete <usuario> <id> &7- Quita una mascota a un jugador."));
+        }
+        if (sender.hasPermission("pet.admin.level")) {
+            sender.sendMessage(ChatUtil.translate("&e/pet level <jugador> <set|give|remove> <id> <cant> &7- Modifica el nivel de una mascota."));
+        }
+        if (sender.hasPermission("pet.admin.reload")) {
+            sender.sendMessage(ChatUtil.translate("&e/pet reload &7- Recarga la configuración del plugin."));
+        }
+        sender.sendMessage(ChatUtil.translate("&e/pet help &7- Muestra este mensaje de ayuda."));
+    }
+
+    // --- El resto de los métodos permanecen sin cambios ---
+    private void handleLevel(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("pet.admin.level")) {
+            sender.sendMessage(configManager.getPrefixedMessage("no-permission"));
+            return;
+        }
+        // Uso: /pet level <jugador> <set|give|remove> <id_mascota> <cantidad>
+        if (args.length < 5) {
+            sender.sendMessage(ChatUtil.translate("&cUso: /pet level <jugador> <set|give|remove> <id_mascota> <cantidad>"));
+            return;
+        }
+
+        Player target = Bukkit.getPlayer(args[1]);
+        String operation = args[2].toLowerCase();
+        String petId = args[3];
+        int amount;
+
+        if (target == null) {
+            sender.sendMessage(configManager.getPrefixedMessage("player-not-found"));
+            return;
+        }
+
+        if (!playerDataManager.getOwnedPets(target).contains(petId)) {
+            sender.sendMessage(configManager.getPrefixedMessage("delete-not-owned").replace("{pet_id}", petId));
+            return;
+        }
+
+        try {
+            amount = Integer.parseInt(args[4]);
+            if (amount < 0) {
+                sender.sendMessage(ChatUtil.translate("&cLa cantidad no puede ser negativa."));
+                return;
+            }
+        } catch (NumberFormatException e) {
+            sender.sendMessage(ChatUtil.translate("&cLa cantidad debe ser un número entero."));
+            return;
+        }
+
+        switch (operation) {
+            case "set":
+                petLevelManager.setLevel(target, petId, amount);
+                sender.sendMessage(ChatUtil.translate("&aEstableciste el nivel de la mascota '&e" + petId + "&a' de &e" + target.getName() + " &aa &e" + amount + "&a."));
+                break;
+            case "give":
+                petLevelManager.giveLevels(target, petId, amount);
+                sender.sendMessage(ChatUtil.translate("&aDiste &e" + amount + " &anivel(es) a la mascota '&e" + petId + "&a' de &e" + target.getName() + "&a."));
+                break;
+            case "remove":
+                petLevelManager.removeLevels(target, petId, amount);
+                sender.sendMessage(ChatUtil.translate("&aQuitaste &e" + amount + " &anivel(es) a la mascota '&e" + petId + "&a' de &e" + target.getName() + "&a."));
+                break;
+            default:
+                sender.sendMessage(ChatUtil.translate("&cUso: /pet level <jugador> <set|give|remove> <id_mascota> <cantidad>"));
+                break;
+        }
+    }
+
+    private boolean isPlayer(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(configManager.getPrefixedMessage("player-only-command"));
+            return false;
+        }
+        return true;
     }
 
     private void handleDelete(CommandSender sender, String[] args) {
@@ -284,24 +404,5 @@ public class PetCommand implements CommandExecutor, TabCompleter {
         }
         configManager.loadConfigs();
         sender.sendMessage(configManager.getPrefixedMessage("config-reloaded"));
-    }
-
-    private void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(ChatUtil.translate("&6--- Ayuda de Pets-Obsidian ---"));
-        sender.sendMessage(ChatUtil.translate("&e/pets &7- Abre el menú principal de mascotas."));
-        sender.sendMessage(ChatUtil.translate("&e/pet shop &7- Abre la tienda de mascotas."));
-        sender.sendMessage(ChatUtil.translate("&e/pet spawn <id> &7- Invoca una mascota que posees."));
-        sender.sendMessage(ChatUtil.translate("&e/pet remove &7- Guarda tu mascota activa."));
-        sender.sendMessage(ChatUtil.translate("&e/pet info <id> &7- Muestra información de una mascota."));
-        if (sender.hasPermission("pet.admin.give")) {
-            sender.sendMessage(ChatUtil.translate("&e/pet give <usuario> <id> <egg|pet> &7- Da una mascota a un jugador."));
-        }
-        if (sender.hasPermission("pet.admin.delete")) {
-            sender.sendMessage(ChatUtil.translate("&e/pet delete <usuario> <id> &7- Quita una mascota a un jugador."));
-        }
-        if (sender.hasPermission("pet.admin.reload")) {
-            sender.sendMessage(ChatUtil.translate("&e/pet reload &7- Recarga la configuración del plugin."));
-        }
-        sender.sendMessage(ChatUtil.translate("&e/pet help &7- Muestra este mensaje de ayuda."));
     }
 }

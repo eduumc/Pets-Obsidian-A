@@ -2,6 +2,7 @@ package us.edumc.obsidianstudios.pets.tasks;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -14,6 +15,9 @@ import us.edumc.obsidianstudios.pets.models.FollowStyle;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
 import us.edumc.obsidianstudios.pets.models.PlayerPetData;
 import us.edumc.obsidianstudios.pets.util.ChatUtil;
+
+import java.util.List;
+import java.util.Map;
 
 public class PetFollowTask extends BukkitRunnable {
 
@@ -133,8 +137,32 @@ public class PetFollowTask extends BukkitRunnable {
     }
 
     private void applyEffects() {
-        if (petConfig.getEffects() == null) return;
-        for (String effectString : petConfig.getEffects()) {
+        // Aplicar efectos base
+        if (petConfig.getEffects() != null) {
+            applyEffectList(petConfig.getEffects());
+        }
+
+        // Aplicar efectos de recompensa por nivel
+        PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, petConfig.getId());
+        Map<String, Object> rewards = petConfig.getRewards();
+        if (rewards != null) {
+            for (int i = 1; i <= petData.getLevel(); i++) {
+                String levelKey = String.valueOf(i);
+                if (rewards.containsKey(levelKey)) {
+                    Object rawData = rewards.get(levelKey);
+                    if (rawData instanceof ConfigurationSection) {
+                        List<String> effects = ((ConfigurationSection) rawData).getStringList("effects");
+                        if (effects != null && !effects.isEmpty()) {
+                            applyEffectList(effects);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void applyEffectList(List<String> effects) {
+        for (String effectString : effects) {
             try {
                 String[] parts = effectString.split(":");
                 PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());

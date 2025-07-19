@@ -38,7 +38,8 @@ public class PetManager {
         }
 
         if (hasPet(player)) {
-            removePet(player);
+            removePet(player, false); // No enviar mensaje de guardado aquí
+            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("pet-already-active"));
         }
 
         ArmorStand petEntity = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -73,11 +74,17 @@ public class PetManager {
     }
 
     public void removePet(Player player) {
+        removePet(player, true);
+    }
+
+    private void removePet(Player player, boolean sendRemoveMessage) {
         Pet pet = activePets.remove(player.getUniqueId());
         if (pet != null) {
             pet.remove();
             clearPetEffects(player, pet.getConfig());
-            player.sendMessage(plugin.getConfigManager().getPrefixedMessage("pet-removed"));
+            if (sendRemoveMessage) {
+                player.sendMessage(plugin.getConfigManager().getPrefixedMessage("pet-removed"));
+            }
         }
     }
 
@@ -85,7 +92,7 @@ public class PetManager {
         for (UUID playerId : new HashMap<>(activePets).keySet()) {
             Player player = Bukkit.getPlayer(playerId);
             if (player != null && player.isOnline()) {
-                removePet(player);
+                removePet(player, false);
             } else {
                 Pet pet = activePets.remove(playerId);
                 if (pet != null) pet.remove();
@@ -97,55 +104,55 @@ public class PetManager {
     private void clearPetEffects(Player player, PetConfig config) {
         // Eliminar efectos base
         if (config.getEffects() != null) {
-            for (String effectString : config.getEffects()) {
-                try {
-                    String[] parts = effectString.split(":");
-                    PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
-                    int amplifier = Integer.parseInt(parts[1]);
-                    if (type != null) {
-                        PotionEffect activeEffect = player.getPotionEffect(type);
-                        if (activeEffect != null && activeEffect.getAmplifier() == amplifier) {
-                            player.removePotionEffect(type);
-                        }
-                    }
-                } catch (Exception ignored) {}
-            }
+            removeEffectList(player, config.getEffects());
         }
 
-        // ================== CORRECCIÓN AQUÍ ==================
-        // Ahora se eliminan los efectos de las recompensas por nivel correctamente.
+        // Eliminar efectos de recompensas por nivel
         PlayerPetData petData = plugin.getPlayerDataManager().getPetData(player, config.getId());
         Map<String, Object> rewards = config.getRewards();
         if (rewards != null) {
             for (int i = 1; i <= petData.getLevel(); i++) {
-                String levelKey = "rewards." + i;
+                String levelKey = String.valueOf(i);
                 if (rewards.containsKey(levelKey)) {
-                    // El valor es una ConfigurationSection, así que la obtenemos.
                     Object rawData = rewards.get(levelKey);
-                    if (rawData instanceof ConfigurationSection) {
-                        ConfigurationSection rewardsSection = (ConfigurationSection) rawData;
-                        List<String> effects = rewardsSection.getStringList("effects");
-                        if (effects != null) {
-                            for (String effectString : effects) {
-                                try {
-                                    String[] parts = effectString.split(":");
-                                    PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
-                                    int amplifier = Integer.parseInt(parts[1]);
-                                    if (type != null) {
-                                        PotionEffect activeEffect = player.getPotionEffect(type);
-                                        if (activeEffect != null && activeEffect.getAmplifier() == amplifier) {
-                                            player.removePotionEffect(type);
-                                        }
-                                    }
-                                } catch (Exception ignored) {}
+                    // Los datos de rewards pueden venir como un ConfigurationSection
+                    if (rawData instanceof Map || rawData instanceof ConfigurationSection) {
+                        Map<String, Object> levelData;
+                        if (rawData instanceof ConfigurationSection) {
+                            levelData = ((ConfigurationSection) rawData).getValues(false);
+                        } else {
+                            levelData = (Map<String, Object>) rawData;
+                        }
+
+                        if (levelData.containsKey("effects")) {
+                            List<String> effects = (List<String>) levelData.get("effects");
+                            if (effects != null) {
+                                removeEffectList(player, effects);
                             }
                         }
                     }
                 }
             }
         }
-        // =====================================================
     }
+
+    private void removeEffectList(Player player, List<String> effects) {
+        for (String effectString : effects) {
+            try {
+                String[] parts = effectString.split(":");
+                PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+                int amplifier = Integer.parseInt(parts[1]);
+                if (type != null) {
+                    PotionEffect activeEffect = player.getPotionEffect(type);
+                    // Solo eliminar el efecto si el amplificador coincide
+                    if (activeEffect != null && activeEffect.getAmplifier() == amplifier) {
+                        player.removePotionEffect(type);
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
 
     public boolean hasPet(Player player) {
         return activePets.containsKey(player.getUniqueId());

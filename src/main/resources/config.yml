@@ -1,5 +1,5 @@
 # Archivo: config.yml
-prefix: "&d&lPets &8» &r"
+prefix: "&x&F&F&0&0&E&3&lP&x&F&A&1&8&E&C&lE&x&F&4&3&1&F&6&lT&x&E&F&4&9&F&F&lS &8» &r"
 shop:
   enabled: true
 pet-settings:
@@ -40,6 +40,8 @@ messages:
   spawn-usage: "&cModo de uso: /pet spawn <id_mascota>"
   spawn-not-owned: "&cNo posees una mascota con ese ID."
   spawn-no-config: "&cError: No se encontró la configuración para esa mascota."
+  level-up: "&aTu mascota ha conseguido el nivel: &e{level}"
+  ability-unlocked: "&aTu mascota ha desbloqueado la habilidad: &e{ability}"
   pet-info-header: "&6&m----------------------------------------"
   pet-info-body:
     - "&eInformación de tu mascota &d{pet_name}"

@@ -10,15 +10,9 @@ import us.edumc.obsidianstudios.pets.commands.PetCommand;
 import us.edumc.obsidianstudios.pets.integrations.PAPIExpansion;
 import us.edumc.obsidianstudios.pets.integrations.VaultIntegration;
 import us.edumc.obsidianstudios.pets.integrations.WorldGuardIntegration;
-import us.edumc.obsidianstudios.pets.listeners.GUIListener;
-import us.edumc.obsidianstudios.pets.listeners.MainMenuListener;
-import us.edumc.obsidianstudios.pets.listeners.PetManagementListener;
-import us.edumc.obsidianstudios.pets.listeners.PlayerChatListener;
-import us.edumc.obsidianstudios.pets.listeners.PlayerListener;
-import us.edumc.obsidianstudios.pets.managers.ConfigManager;
-import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
-import us.edumc.obsidianstudios.pets.managers.PetManager;
-import us.edumc.obsidianstudios.pets.managers.PlayerDataManager;
+import us.edumc.obsidianstudios.pets.listeners.*;
+import us.edumc.obsidianstudios.pets.managers.*;
+import us.edumc.obsidianstudios.pets.util.Complement;
 import us.edumc.obsidianstudios.pets.util.ConsoleFilter;
 
 import java.util.HashMap;
@@ -59,16 +53,26 @@ public final class PetsObsidian extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        // ✅ Validar licencia
+        String hwid = getServer().getIp(); // puedes hacer una lógica más compleja si deseas
+        if (!Complement.validar(hwid)) {
+            getLogger().warning("❌ Licencia inválida. Desactivando el plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        getLogger().info("✅ Licencia válida. Plugin activado correctamente.");
+
+        // ✅ Carga de configuraciones y sistemas
         this.configManager = new ConfigManager(this);
         configManager.loadConfigs();
         this.playerDataManager = new PlayerDataManager(this);
         this.petLevelManager = new PetLevelManager(this);
         this.petManager = new PetManager(this);
 
+        // ✅ Hooks y dependencias
         setupIntegrations();
 
-        Logger.getLogger("").setFilter(new ConsoleFilter());
-
+        // ✅ Comandos y listeners
         PetCommand petCommand = new PetCommand(this);
         getCommand("pet").setExecutor(petCommand);
         getCommand("pet").setTabCompleter(petCommand);
@@ -78,6 +82,9 @@ public final class PetsObsidian extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(new PetManagementListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+
+        // ✅ Ocultar errores
+        Logger.getLogger("").setFilter(new ConsoleFilter());
 
         getLogger().info("Pets-Obsidian ha sido activado correctamente.");
     }
@@ -111,16 +118,43 @@ public final class PetsObsidian extends JavaPlugin {
     }
 
     private boolean isPluginEnabled(String pluginName) {
-        return getServer().getPluginManager().getPlugin(pluginName) != null && getServer().getPluginManager().isPluginEnabled(pluginName);
+        return getServer().getPluginManager().getPlugin(pluginName) != null
+                && getServer().getPluginManager().isPluginEnabled(pluginName);
     }
 
-    public static PetsObsidian getInstance() { return instance; }
-    public ConfigManager getConfigManager() { return configManager; }
-    public PetManager getPetManager() { return petManager; }
-    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
-    public PetLevelManager getPetLevelManager() { return petLevelManager; }
-    public VaultIntegration getVaultIntegration() { return vaultIntegration; }
-    public WorldGuardIntegration getWorldGuardIntegration() { return worldGuardIntegration; }
-    public Map<UUID, String> getPlayerNamingMap() { return playerNamingMap; }
-    public Map<UUID, String> getPlayerParticleMap() { return playerParticleMap; }
+    public static PetsObsidian getInstance() {
+        return instance;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public PetManager getPetManager() {
+        return petManager;
+    }
+
+    public PlayerDataManager getPlayerDataManager() {
+        return playerDataManager;
+    }
+
+    public PetLevelManager getPetLevelManager() {
+        return petLevelManager;
+    }
+
+    public VaultIntegration getVaultIntegration() {
+        return vaultIntegration;
+    }
+
+    public WorldGuardIntegration getWorldGuardIntegration() {
+        return worldGuardIntegration;
+    }
+
+    public Map<UUID, String> getPlayerNamingMap() {
+        return playerNamingMap;
+    }
+
+    public Map<UUID, String> getPlayerParticleMap() {
+        return playerParticleMap;
+    }
 }

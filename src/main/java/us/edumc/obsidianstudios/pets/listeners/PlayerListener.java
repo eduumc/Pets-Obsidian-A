@@ -29,9 +29,11 @@ import us.edumc.obsidianstudios.pets.managers.PetLevelManager;
 import us.edumc.obsidianstudios.pets.managers.PetManager;
 import us.edumc.obsidianstudios.pets.models.Pet;
 import us.edumc.obsidianstudios.pets.models.PetConfig;
+import us.edumc.obsidianstudios.pets.models.PlayerPetData;
 import us.edumc.obsidianstudios.pets.util.ChatUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -142,6 +144,9 @@ public class PlayerListener implements Listener {
         Pet activePet = plugin.getPetManager().getActivePet(killer);
         if (activePet == null) return;
 
+        PlayerPetData petDataBefore = plugin.getPlayerDataManager().getPetData(killer, activePet.getConfig().getId());
+        int levelBefore = petDataBefore.getLevel();
+
         PetLevelManager levelManager = plugin.getPetLevelManager();
         double xpAmount = 0;
 
@@ -157,6 +162,33 @@ public class PlayerListener implements Listener {
 
         if (xpAmount > 0) {
             levelManager.addXp(killer, activePet, xpAmount);
+
+            PlayerPetData petDataAfter = plugin.getPlayerDataManager().getPetData(killer, activePet.getConfig().getId());
+            int levelAfter = petDataAfter.getLevel();
+
+            if (levelAfter > levelBefore) {
+                PetConfig petConfig = activePet.getConfig();
+                Map<String, Object> rewards = petConfig.getRewards();
+                if (rewards != null) {
+                    // La clave en el YAML es '10', '25', etc. así que la buscamos directamente.
+                    String levelKey = String.valueOf(levelAfter);
+                    if (rewards.containsKey(levelKey)) {
+                        // Accedemos a la sección de ese nivel y luego a la lista de "effects"
+                        Object rawData = rewards.get(levelKey + ".effects");
+                        if (rawData instanceof List) {
+                            @SuppressWarnings("unchecked")
+                            List<String> effects = (List<String>) rawData;
+                            if (effects != null) {
+                                for (String effect : effects) {
+                                    String message = plugin.getConfigManager().getPrefixedMessage("ability-unlocked")
+                                            .replace("{ability}", effect);
+                                    killer.sendMessage(ChatUtil.translate(message));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
